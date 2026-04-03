@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 60px auto;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    h1 { color: #333; }
+    input {
+      padding: 10px;
+      width: 70%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover { background: #45a049; }
+    ul {
+      margin-top: 20px;
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      background: white;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 4px;
+      border-left: 4px solid #4CAF50;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .delete-btn {
+      background: #e74c3c;
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+    .delete-btn:hover { background: #c0392b; }
+  </style>
+</head>
+<body>
+  <h1>📋 Task Manager</h1>
+  <input type="text" id="taskInput" placeholder="Enter a task..." />
+  <button onclick="addTask()">Add Task</button>
+  <ul id="taskList"></ul>
+
+  <script>
+    async function loadTasks() {
+      const res = await fetch('/tasks');
+      const tasks = await res.json();
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      if (tasks.length === 0) {
+        list.innerHTML = '<li>No tasks yet. Add one above!</li>';
+      } else {
+        tasks.forEach((task, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>${task}</span>
+            <button class="delete-btn" onclick="deleteTask(${index})">🗑 Delete</button>
+          `;
+          list.appendChild(li);
+        });
+      }
+    }
+
+    async function addTask() {
+      const input = document.getElementById('taskInput');
+      const task = input.value.trim();
+      if (!task) return;
+      await fetch('/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task)
+      });
+      input.value = '';
+      loadTasks();
+    }
+
+    async function deleteTask(index) {
+      await fetch(`/tasks/${index}`, { method: 'DELETE' });
+      loadTasks();
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
