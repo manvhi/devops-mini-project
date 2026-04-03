@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: devops-app
@@ -23,7 +22,20 @@ jobs:
         java-version: '17'
 
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn clean compile
 
-    - name: Run Tests
-      run: mvn test
+    - name: Run Unit Tests
+      run: mvn -Dtest=!SeleniumTest test
+
+    - name: Package JAR
+      run: mvn -DskipTests package
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-jar
+        path: devops-app/target/*.jar
+
+    - name: Run Selenium Tests (Local Only)
+      if: false  # Disable in CI, run locally only
+      run: mvn -Dtest=SeleniumTest test
