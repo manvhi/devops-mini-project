@@ -18,22 +18,25 @@ public class TaskController {
 
     private List<String> tasks = new ArrayList<>();
 
+    // Returns all tasks
     @GetMapping("/tasks")
     public List<String> getTasks() {
         return tasks;
     }
 
+    // Adds a new task
     @PostMapping("/tasks")
     public String addTask(@RequestBody String task) {
         tasks.add(task);
-        return "Task added";
+        return "Task added successfully";
     }
 
+    // Deletes task by index
     @DeleteMapping("/tasks/{index}")
     public String deleteTask(@PathVariable int index) {
         if (index >= 0 && index < tasks.size()) {
             tasks.remove(index);
-            return "Task deleted";
+            return "Task deleted successfully";
         }
         return "Invalid index";
     }
